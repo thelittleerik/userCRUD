@@ -1,19 +1,18 @@
 package com.example.userCRUD.user;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
-import java.lang.reflect.Array;
+import java.util.List;
 import java.util.UUID;
 
+@Entity
 @Data
+@Table(name="users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "user_ID", nullable = false, unique = true)
+    @Column(name = "id", nullable = false, unique = true)
     private UUID id;
 
     @Column(name = "first_name", nullable = false)
@@ -25,12 +24,16 @@ public class User {
     @Column(name = "age", nullable = false)
     private int age;
 
-    @Column(name = "hobbies", nullable = false)
-    private Array hobbies;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_hobbies", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "hobby", nullable = false)
+    private List<String> hobbies;
 
     @Column(name = "smoker", nullable = false)
-    private Boolean smoker = false;
+    private boolean smoker = false;
 
     @Column(name = "fav_food", nullable = false)
-    private String fav_food;
+    private String favoriteFood;
+
+    public User() {}
 }
