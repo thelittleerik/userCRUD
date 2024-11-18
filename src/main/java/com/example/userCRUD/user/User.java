@@ -15,21 +15,22 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "user_ID", nullable = false, unique = true)
     private UUID id;
+
     @Column(name = "first_name", nullable = false)
-
     private String firstname;
+
     @Column(name = "last_name", nullable = false)
-
     private String lastname;
+
     @Column(name = "age", nullable = false)
-
     private int age;
+
     @Column(name = "hobbies", nullable = false)
-
     private Array hobbies;
-    @Column(name = "smoker", nullable = false)
 
+    @Column(name = "smoker", nullable = false)
     private Boolean smoker = false;
+
     @Column(name = "fav_food", nullable = false)
     private String fav_food;
 }
