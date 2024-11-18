@@ -21,7 +21,7 @@ class UserCRUDApplicationTests {
 				.age(28)
 				.hobbies(List.of(gambling, hussling))
 				.smoker(true)
-				.favoriteFood("cigares")
+				.favoriteFood("cigares & coffee")
 				;
 
 		userRepository.save(user);

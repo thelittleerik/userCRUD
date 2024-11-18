@@ -1,6 +1,7 @@
 package com.example.userCRUD.user;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 @Builder
+@AllArgsConstructor
 @Table(name="users")
 public class User {
     @Id
@@ -38,6 +40,4 @@ public class User {
 
     @Column(name = "fav_food", nullable = false)
     private String favoriteFood;
-
-    public User() {}
 }
