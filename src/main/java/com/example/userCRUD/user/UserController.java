@@ -1,5 +1,6 @@
 package com.example.userCRUD.user;
 
+import com.example.userCRUD.user.dtos.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -71,14 +72,22 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User successfully created", content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = User.class)
+                    schema = @Schema(implementation = UserDto.class)
             )),
             @ApiResponse(responseCode = "400", description = "Bad request, invalid user details", content = @Content)
     })
     @PostMapping("/new")
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        userRepository.save(user);
-        return ResponseEntity.status(201).body(user);
+    public ResponseEntity<User> createUser(@RequestBody UserDto userDto) {
+        User regUser = new User();
+        regUser.setFirstname(userDto.getFirstname());
+        regUser.setLastname(userDto.getLastname());
+        regUser.setAge(userDto.getAge());
+        regUser.setHobbies(userDto.getHobbies());
+        regUser.setSmoker(userDto.isSmoker());
+        regUser.setFavoriteFood(userDto.getFavoriteFood());
+
+        userRepository.save(regUser);
+        return ResponseEntity.status(201).body(regUser);
     }
 
     @Operation(
@@ -88,12 +97,12 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User successfully updated", content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = User.class)
+                    schema = @Schema(implementation = UserDto.class)
             )),
             @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
     })
     @PutMapping("/{id}/edit")
-    public ResponseEntity<User> updateUser(@PathVariable UUID id, @RequestBody User user) {
+    public ResponseEntity<User> updateUser(@PathVariable UUID id, @RequestBody UserDto userDto) {
         Optional<User> existingUserOpt = userRepository.findById(id);
 
         if (existingUserOpt.isEmpty()) {
@@ -102,22 +111,22 @@ public class UserController {
 
         User existingUser = existingUserOpt.get();
 
-        if (user.getFirstname() != null) {
-            existingUser.setFirstname(user.getFirstname());
+        if (userDto.getFirstname() != null) {
+            existingUser.setFirstname(userDto.getFirstname());
         }
-        if (user.getLastname() != null) {
-            existingUser.setLastname(user.getLastname());
+        if (userDto.getLastname() != null) {
+            existingUser.setLastname(userDto.getLastname());
         }
-        if (user.getAge() != 0) {
-            existingUser.setAge(user.getAge());
+        if (userDto.getAge() != 0) {
+            existingUser.setAge(userDto.getAge());
         }
-        if (user.getHobbies() != null) {
-            existingUser.setHobbies(user.getHobbies());
+        if (userDto.getHobbies() != null) {
+            existingUser.setHobbies(userDto.getHobbies());
         }
-        existingUser.setSmoker(user.isSmoker());
+        existingUser.setSmoker(userDto.isSmoker());
 
-        if (user.getFavoriteFood() != null) {
-            existingUser.setFavoriteFood(user.getFavoriteFood());
+        if (userDto.getFavoriteFood() != null) {
+            existingUser.setFavoriteFood(userDto.getFavoriteFood());
         }
 
         userRepository.save(existingUser);
