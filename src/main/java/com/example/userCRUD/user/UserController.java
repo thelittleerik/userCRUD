@@ -48,6 +48,43 @@ public class UserController {
     }
 
     @Operation(
+            summary = "Finds users by their first name",
+            description = "Retrieves a list of Users based on their first name."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "The search query has been successfully executed.",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = User.class),
+                    array = @ArraySchema(schema = @Schema(implementation = User.class))
+            ))
+
+    })
+    @GetMapping("/users/search")
+    public ResponseEntity<List<User>> findUserByName(@RequestParam("firstname") String name) {
+         return ResponseEntity.ok(userRepository.findAllByFirstnameContaining((name)));
+    }
+
+    @Operation(
+            summary= "Get user by their Id.",
+            description = "Get a user by their given Id (UUID)."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description ="The user is found and the their data is retrieved.",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = User.class)
+            )),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
+    })
+
+    @GetMapping("/users/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable UUID id) {
+        Optional<User> user = userRepository.findById(id);
+        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @Operation(
             summary = "Deletes a user from the database.",
             description = "Deletes a user by the given ID from the database. Returns status 200 if successful."
     )
