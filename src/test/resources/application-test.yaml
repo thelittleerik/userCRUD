@@ -1,0 +1,8 @@
+# because I want tests to be self-contained, we let them run with an in-memory H2 database
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+  jpa:
+    hibernate.ddl-auto: create
