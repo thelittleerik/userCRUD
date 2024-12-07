@@ -1,16 +1,18 @@
 package com.example.userCRUD;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import com.example.userCRUD.user.User;
 import com.example.userCRUD.user.UserRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import com.example.userCRUD.user.User;
+import org.springframework.test.context.ActiveProfiles;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
+@ActiveProfiles("test")
 @SpringBootTest
 class UserCRUDApplicationTests {
 
@@ -18,7 +20,7 @@ class UserCRUDApplicationTests {
 	private UserRepository userRepository;
 
 	@Test
-	public void saveUserTest() {
+	void saveUserTest() { // no need to make tests public. sonar warns as well.
 		User user = User.builder()
 				.id(UUID.randomUUID())
 				.firstname("Erik")
@@ -56,6 +58,8 @@ class UserCRUDApplicationTests {
 
 		userRepository.save(user);
 
+		// note this is edgy: usually your DB will assign the ID acc to your GeneratedValue strategy
+		// so no guarantee that the id will be user assigned instead of db assigned here:
 		Optional<User> foundUser = userRepository.findById(user.getId());
 		Assertions.assertThat(foundUser).isPresent();
 		Assertions.assertThat(foundUser.get().getFirstname()).isEqualTo("Alice");

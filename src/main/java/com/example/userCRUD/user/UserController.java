@@ -1,5 +1,9 @@
 package com.example.userCRUD.user;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import com.example.userCRUD.user.dtos.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -9,12 +13,18 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("api/user")
@@ -32,19 +42,12 @@ public class UserController {
             description = "A non-paginated response retrieving all user objects from the database."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "All users have been fetched successfully",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = User.class),
-                            array = @ArraySchema(schema = @Schema(implementation = User.class))
-                    )
-            ),
-            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content)
+            @ApiResponse(responseCode = "200", description = "All users have been fetched successfully")
+            // the rest is redundant...
     })
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        return ResponseEntity.ok(users);
+    public List<User> getAllUsers() { // no need for ResponseEntity<> wrappers
+        return userRepository.findAll();
     }
 
     @Operation(
@@ -114,7 +117,8 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Bad request, invalid user details", content = @Content)
     })
     @PostMapping("/new")
-    public ResponseEntity<User> createUser(@RequestBody UserDto userDto) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createUser(@RequestBody UserDto userDto) {
         User regUser = new User();
         regUser.setFirstname(userDto.getFirstname());
         regUser.setLastname(userDto.getLastname());
@@ -122,9 +126,7 @@ public class UserController {
         regUser.setHobbies(userDto.getHobbies());
         regUser.setSmoker(userDto.isSmoker());
         regUser.setFavoriteFood(userDto.getFavoriteFood());
-
         userRepository.save(regUser);
-        return ResponseEntity.status(201).body(regUser);
     }
 
     @Operation(
@@ -143,6 +145,8 @@ public class UserController {
         Optional<User> existingUserOpt = userRepository.findById(id);
 
         if (existingUserOpt.isEmpty()) {
+            // alternatively: throw an Exception annotated with @ResponseCode.
+            // it gets more readable than the ResponseEntity<> wrappers.
             return ResponseEntity.notFound().build();
         }
 
@@ -166,7 +170,8 @@ public class UserController {
             existingUser.setFavoriteFood(userDto.getFavoriteFood());
         }
 
-        userRepository.save(existingUser);
+        // there is no need to save. the existingUser is a managed entity anyway so the transaction will be committed
+        // at the end of this method anyway. this is a common misconception I see often.
         return ResponseEntity.ok(existingUser);
     }
 }
